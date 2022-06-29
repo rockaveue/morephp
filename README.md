@@ -1,15 +1,15 @@
 # TOC
 
-1. [PHP Frameworks](php-frameworks)
-1. [Configuring PHP-FPM for amazon-linux-2](Configuring-PHP-FPM-for-amazon-linux-2)
+1. [PHP Frameworks](#php-frameworks)
+1. [Configuring PHP-FPM for amazon-linux-2](#Configuring-PHP-FPM-for-amazon-linux-2)
 
 # PHP Frameworks
 
-1. [Laravel](laravel)
-1. [Yii](yii)
-1. [Symfony](symfony)
-1. [Zend](zend)
-1. [Cake](cake)
+1. [Laravel](#laravel)
+1. [Yii](#yii)
+1. [Symfony](#symfony)
+1. [Zend](#zend)
+1. [Cake](#cake)
 
 ## Laravel
 
