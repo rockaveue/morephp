@@ -4,6 +4,7 @@
 1. [Configuring PHP-FPM for amazon-linux-2](#configuring-PHP-FPM-for-amazon-linux-2)
 1. [Apache-ийг дэмждэг PHP handler-ууд](#Apache-ийг-дэмждэг-PHP-handler-ууд)
 1. [Default configurations for php8.1 and what to change](#Default-configurations-for-php81-and-what-to-change)
+1. [Configuring multiple pools with PHP-FPM](#Configuring-multiple-pools-with-PHP-FPM)
 
 # PHP Frameworks
 
@@ -418,7 +419,7 @@ sudo tail -f /var/log/php-fpm/error.log
 1. [php-fpm configuration details](https://www.php.net/manual/en/install.fpm.configuration.php)
 1. [calculate max_children, start_servers](https://www.isscloud.io/guides/php-fpm-settings-for-best-performance/)
 
-## Configure multiple pools
+# Configuring multiple pools with PHP-FPM
 
 single pool configuration: #23 
 
