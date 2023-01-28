@@ -417,3 +417,138 @@ sudo tail -f /var/log/php-fpm/error.log
 1. [pm dynamic q&a](https://stackoverflow.com/a/39565423)
 1. [php-fpm configuration details](https://www.php.net/manual/en/install.fpm.configuration.php)
 1. [calculate max_children, start_servers](https://www.isscloud.io/guides/php-fpm-settings-for-best-performance/)
+
+## Configure multiple pools
+
+single pool configuration: #23 
+
+### 1. Creating site users
+
+```sh
+sudo useradd site1
+sudo useradd site2
+sudo usermod -a -G apache site1
+sudo usermod -a -G apache site2
+```
+
+### 2. Assign directory permissions
+
+```sh
+sudo mkdir /var/www/site1
+sudo mkdir /var/www/site2
+sudo chown -R site1:site1 /var/www/site1
+sudo chown -R site2:site2 /var/www/site2
+sudo chmod 770 /var/www/site2
+```
+
+### 3. PHP-FPM pool configurations
+
+```sh
+sudo cp /etc/php-fpm.d/www.conf /etc/php-fpm.d/site1.conf
+```
+
+Change lines below tin `/etc/php-fpm.d/site1.conf`
+
+```diff
+- [www]
++ [site1]
+
+@@
+- listen = 127.0.0.1:9000
++ listen = /var/run/php-fpm/site1.sock
++ listen.owner = site1
++ listen.group = site1
++ listen.mode = 0666
+```
+
+Copy site1.conf to site2 conf
+
+```sh
+sudo cp /etc/php-fpm.d/site1.conf /etc/php-fpm.d/site2.conf
+```
+
+Update the site2.conf file by replace all occurences of `site1` with `site2`
+
+`sudo sed -i 's|site1|site2|g' /etc/php-fpm.d/site2.conf`
+
+Restart php-fpm
+
+```sh
+sudo systemctl restart php-fpm
+```
+
+### 4. Apache configuration
+
+<details><summary>/etc/httpd/conf.d/site1.conf</summary>
+
+```conf
+<VirtualHost *:80>
+    ServerAdmin admin@example.com
+    DocumentRoot /var/html/www2
+
+    ServerName test.example.com
+    ServerAlias test.example.com
+
+<!--     SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1 -->
+    <Proxy "unix:/var/run/php-fpm/site1.sock|fcgi://php-fpm">
+        ProxySet disablereuse=off
+    </Proxy>
+    <FilesMatch \.php$>
+       SetHandler proxy:fcgi://php-fpm
+    </FilesMatch>
+    <LocationMatch "/status">
+        ProxyPass unix:/var/run/php-fpm/site1.sock|fcgi://localhost/status
+    </LocationMatch>
+
+    ErrorLog logs/admin-error.log
+    CustomLog logs/admin-access.log combined
+
+    <Directory /var/html/www2>
+    AllowOverride All
+    Require all granted
+    </Directory>
+</VirtualHost>
+```
+
+</details>
+
+<details><summary>/etc/httpd/conf.d/site2.conf</summary>
+
+```conf
+<VirtualHost *:80>
+    ServerAdmin admin@example.com
+    DocumentRoot /var/html/www
+
+    ServerName example.com
+    ServerAlias www.example.com
+
+    <Proxy "unix:/var/run/php-fpm/site2.sock|fcgi://php-fpm">
+        ProxySet disablereuse=off
+    </Proxy>
+    <FilesMatch \.php$>
+        SetHandler proxy:fcgi://php-fpm
+    </FilesMatch>
+    <LocationMatch "/status">
+        ProxyPass unix:/var/run/php-fpm/site2.sock|fcgi://localhost/status
+    </LocationMatch>
+
+    ErrorLog logs/reward-error.log
+    CustomLog logs/reward-access.log combined
+
+    <Directory /var/html/www>
+        Require all granted
+
+        AllowOverride All
+    </Directory>
+</VirtualHost>
+```
+
+</details>
+
+### 5. Checking
+
+If you uncomment the `pm.status_path = /status` line in php-fpm configuration you can access to `/status` page. 
+
+<!-- Example: -->
+
+<!--![image](/uploads/0f3634aef892d6b913eb593cb5eb6e46/image.png)-->
