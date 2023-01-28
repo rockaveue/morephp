@@ -3,7 +3,7 @@
 1. [PHP Frameworks](#php-frameworks)
 1. [Configuring PHP-FPM for amazon-linux-2](#configuring-PHP-FPM-for-amazon-linux-2)
 1. [Apache-ийг дэмждэг PHP handler-ууд](#Apache-ийг-дэмждэг-PHP-handler-ууд)
-1. [Default configurations for php8.1 and what to change](#Default-configurations-for-php8.1-and-what-to-change)
+1. [Default configurations for php8.1 and what to change](#Default-configurations-for-php81-and-what-to-change)
 
 # PHP Frameworks
 
